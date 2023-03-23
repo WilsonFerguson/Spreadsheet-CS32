@@ -1,7 +1,3 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 // CS3 Spreadsheet Sheet class. Update this file with your own code.
 
 public class Sheet {
@@ -20,21 +16,27 @@ public class Sheet {
 	}
 
 	private boolean isValidCell(String cell) {
-		if (cell.length() != 2)
-			return false;
+		cell = cell.toUpperCase();
 
 		char col = cell.charAt(0);
 		if (col < 'A' || col > 'L') {
 			return false;
 		}
-		int row = Integer.parseInt(cell.substring(1));
-		if (row < 1 || row > 20) {
+
+		try {
+			int row = Integer.parseInt(cell.substring(1));
+			if (row < 1 || row > 20) {
+				return false;
+			}
+		} catch (Exception e) {
 			return false;
 		}
+
 		return true;
 	}
 
 	private SheetLocation getCellLocation(String location) {
+		location = location.toUpperCase();
 		char col = location.charAt(0);
 		int row = Integer.parseInt(location.substring(1));
 		return new SheetLocation(row - 1, col - 'A');
@@ -43,10 +45,14 @@ public class Sheet {
 	private Cell getCellFromString(String value) {
 		Cell cell;
 
+		// First check if it's value is a cell reference
+		if (isValidCell(value))
+			return getCell(getCellLocation(value));
+
 		if (value.contains("/")) {
 			cell = new DateCell(value);
 		} else if (value.contains("\"")) {
-			cell = new TextCell(value);
+			cell = new TextCell(value.substring(1, value.length() - 1));
 		} else {
 			cell = new RealCell(value);
 		}
@@ -66,13 +72,19 @@ public class Sheet {
 	}
 
 	private String processStringAssignmentCommand(String command) {
-		String[] parts = command.split(" ");
-		if (parts.length != 3)
+		if (!command.contains("="))
+			return null;
+
+		String[] parts = command.split("=");
+		if (parts.length != 2)
 			return null;
 
 		// ex: A1 = 1
 		String cellString = parts[0];
-		String value = parts[2];
+		String value = parts[1];
+
+		cellString = cellString.trim();
+		value = value.trim();
 
 		if (!isValidCell(cellString))
 			return null;
@@ -102,7 +114,7 @@ public class Sheet {
 	}
 
 	private String processClearCommand(String command) {
-		if (!command.equals("clear"))
+		if (!command.toLowerCase().equals("clear"))
 			return null;
 
 		for (int i = 0; i < ROWS; i++) {
@@ -172,12 +184,15 @@ public class Sheet {
 		output += "\n";
 
 		for (int i = 0; i < ROWS; i++) {
-			output += (i + 1) + "  |";
+			output += (i + 1);
+			if (i < 9)
+				output += "  |";
+			else
+				output += " |";
 			for (int j = 0; j < COLS; j++) {
 				output += getCell(i, j).abbreviatedCellText() + "|";
 			}
-			if (i < ROWS - 1)
-				output += "\n";
+			output += "\n";
 		}
 
 		return output;

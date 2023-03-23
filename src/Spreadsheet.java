@@ -14,7 +14,7 @@ public class Spreadsheet {
 		while (true) {
 			System.out.print("Enter a command: ");
 			String command = console.nextLine();
-			if (command.equals("quit")) {
+			if (command.toLowerCase().equals("quit")) {
 				break;
 			}
 			System.out.println(sheet.processCommand(command));

@@ -27,7 +27,6 @@ public class TextCell extends Cell {
 	/** Includes enclosing quotes */
 	@Override
 	public String fullCellText() {
-		// return "\"" + text + "\"";
-		return text;
+		return "\"" + text + "\"";
 	}
 }
