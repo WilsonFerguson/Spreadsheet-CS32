@@ -9,7 +9,130 @@ public class FormulaCell extends RealCell {
 	}
 
 	// TODO: add private methods as needed
+	private boolean isNumber(String value) {
+		try {
+			Double.parseDouble(value);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	private double getValue(String cell) {
+		if (isNumber(cell)) {
+			return Double.parseDouble(cell);
+		} else {
+			Cell c = sheet.getCell(cell);
+			if (c instanceof RealCell) {
+				return ((RealCell) c).getDoubleValue();
+			} else {
+				return 0.0;
+			}
+		}
+	}
+
+	private String[] parseRange(String range) {
+		String[] parts = range.split("-");
+
+		String startCell = parts[0];
+		String endCell = parts[1];
+
+		char startCol = Character.toUpperCase(startCell.charAt(0));
+		char endCol = Character.toUpperCase(endCell.charAt(0));
+		int startRow = Integer.parseInt(startCell.substring(1));
+		int endRow = Integer.parseInt(endCell.substring(1));
+
+		String[][] cells = new String[Math.abs(endCol - startCol) + 1][Math.abs(endRow - startRow) + 1];
+		for (char col = startCol; col <= endCol; col++) {
+			for (int row = startRow; row <= endRow; row++) {
+				cells[col - startCol][row - startRow] = String.valueOf(col) + String.valueOf(row);
+			}
+		}
+
+		String[] result = new String[cells.length * cells[0].length];
+		int index = 0;
+		for (int i = 0; i < cells.length; i++) {
+			for (int j = 0; j < cells[i].length; j++) {
+				result[index] = cells[i][j];
+				index++;
+			}
+		}
+
+		return result;
+	}
+
+	private double handleMethod(String[] parts) {
+		if (parts.length != 2)
+			return 0;
+
+		String method = parts[0].trim().toUpperCase();
+		if (!(method.equals("SUM") || method.equals("AVG")))
+			return 0;
+
+		String[] cells;
+		if (parts[1].contains("-")) {
+			cells = parseRange(parts[1]);
+		} else {
+			cells = new String[] { parts[1] };
+		}
+
+		double sum = 0;
+		for (String cell : cells) {
+			sum += getValue(cell.trim());
+		}
+
+		if (method.equals("SUM"))
+			return sum;
+		else
+			return sum / cells.length;
+	}
 
 	// TODO: override the getDoubleValue() method
+	@Override
+	public double getDoubleValue() {
+		String formula = fullCellText().substring(2, fullCellText().length() - 2); // Remove the parentheses
+
+		String[] parts = formula.split(" ");
+
+		if (parts.length == 1)
+			return getValue(parts[0]);
+
+		double result = 0;
+		if ((result = handleMethod(parts)) != 0)
+			return result;
+
+		while (parts.length >= 3) {
+			double left = getValue(parts[0]);
+			double right = getValue(parts[2]);
+			String operator = parts[1];
+
+			switch (operator) {
+				case "+":
+					result = left + right;
+					break;
+				case "-":
+					result = left - right;
+					break;
+				case "*":
+					result = left * right;
+					break;
+				case "/":
+					result = left / right;
+					break;
+				default:
+					return 0;
+			}
+
+			String[] newParts = new String[parts.length - 2];
+			newParts[0] = String.valueOf(result);
+			for (int i = 3; i < parts.length; i++) {
+				newParts[i - 2] = parts[i];
+			}
+
+			parts = newParts;
+		}
+
+		return result;
+	}
 
 }

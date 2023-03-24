@@ -7,7 +7,13 @@ public class DateCell extends Cell {
 
 	// TODO: add a constructor that initializes the attribute
 	public DateCell(String date) {
-		this.date = date;
+		String[] dateParts = date.split("/");
+		if (dateParts[0].length() == 1)
+			dateParts[0] = "0" + dateParts[0];
+		if (dateParts[1].length() == 1)
+			dateParts[1] = "0" + dateParts[1];
+		
+		this.date = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
 	}
 
 	// TODO: override the abbreviatedCellText method

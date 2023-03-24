@@ -13,7 +13,7 @@ public class RealCell extends Cell {
 
 	@Override
 	public String abbreviatedCellText() {
-		String output = fullText;
+		String output = String.valueOf(getDoubleValue());
 		if (output.length() > 10) {
 			output = output.substring(0, 10);
 		} else {

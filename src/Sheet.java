@@ -42,19 +42,44 @@ public class Sheet {
 		return new SheetLocation(row - 1, col - 'A');
 	}
 
+	private boolean isNumber(String value) {
+		try {
+			Double.parseDouble(value);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	private Cell getCellFromString(String value) {
 		Cell cell;
+
+		value = value.trim();
 
 		// First check if it's value is a cell reference
 		if (isValidCell(value))
 			return getCell(getCellLocation(value));
 
-		if (value.contains("/")) {
-			cell = new DateCell(value);
-		} else if (value.contains("\"")) {
+		// if (value.charAt(0) == '\"' && value.charAt(value.length() - 1) == '\"') {
+		// 	cell = new TextCell(value.substring(1, value.length() - 1));
+		// } else if (value.contains("/")) {
+		// 	cell = new DateCell(value);
+		// } else if (isNumber(value)) {
+		// 	cell = new RealCell(value);
+		// } else {
+		// 	cell = new FormulaCell(value, this);
+		// }
+
+		if (value.charAt(0) == '\"' && value.charAt(value.length() - 1) == '\"') {
 			cell = new TextCell(value.substring(1, value.length() - 1));
-		} else {
+		} else if (value.charAt(0) == '(' && value.charAt(value.length() - 1) == ')') {
+			cell = new FormulaCell(value, this);
+		} else if (value.contains("/")) {
+			cell = new DateCell(value);
+		} else if (isNumber(value)) {
 			cell = new RealCell(value);
+		} else {
+			cell = new TextCell(value);
 		}
 
 		return cell;
@@ -75,11 +100,9 @@ public class Sheet {
 		if (!command.contains("="))
 			return null;
 
-		String[] parts = command.split("=");
-		if (parts.length != 2)
-			return null;
+		// Split by the first = sign
+		String[] parts = command.split("=", 2);
 
-		// ex: A1 = 1
 		String cellString = parts[0];
 		String value = parts[1];
 
@@ -173,6 +196,10 @@ public class Sheet {
 
 	public Cell getCell(int row, int col) {
 		return sheet[row][col];
+	}
+
+	public Cell getCell(String cell) {
+		return getCell(getCellLocation(cell));
 	}
 
 	@Override
