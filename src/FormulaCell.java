@@ -1,5 +1,3 @@
-import org.w3c.dom.ranges.Range;
-
 // CS3 Spreadsheet FormulaCell class.  Fill in the details.
 
 public class FormulaCell extends RealCell {
@@ -29,7 +27,7 @@ public class FormulaCell extends RealCell {
 			if (c instanceof RealCell) {
 				return ((RealCell) c).getDoubleValue();
 			} else {
-				return -1;
+				return Double.NaN;
 			}
 		}
 	}
@@ -106,8 +104,8 @@ public class FormulaCell extends RealCell {
 		while (parts.length >= 3) {
 			double left = getValue(parts[0]);
 			double right = getValue(parts[2]);
-			if (left == -1 || right == -1)
-				return -1;
+			if (left == Double.NaN || right == Double.NaN)
+				return Double.NaN;
 
 			String operator = parts[1];
 
@@ -143,7 +141,7 @@ public class FormulaCell extends RealCell {
 	@Override
 	public String abbreviatedCellText() {
 		String output = String.valueOf(getDoubleValue());
-		if (output.equals("-1.0"))
+		if (output.equals("NaN"))
 			output = "#ERROR";
 		if (output.length() > 10) {
 			output = output.substring(0, 10);

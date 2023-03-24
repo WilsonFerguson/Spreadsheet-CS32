@@ -48,8 +48,8 @@ public class RangeFunction {
                 double sum = 0;
                 for (String cell : cells) {
                     double value = getCellValue(sheet, cell.trim());
-                    if (value == -1)
-                        return -1;
+                    if (value == Double.NaN)
+                        return Double.NaN;
                     sum += value;
                 }
                 return sum;
@@ -62,8 +62,8 @@ public class RangeFunction {
                 double sum = 0;
                 for (String cell : cells) {
                     double value = getCellValue(sheet, cell.trim());
-                    if (value == -1)
-                        return -1;
+                    if (value == Double.NaN)
+                        return Double.NaN;
                     sum += value;
                 }
                 return sum / cells.length;
@@ -76,8 +76,8 @@ public class RangeFunction {
                 double max = Double.MIN_VALUE;
                 for (String cell : cells) {
                     double value = getCellValue(sheet, cell.trim());
-                    if (value == -1)
-                        return -1;
+                    if (value == Double.NaN)
+                        return Double.NaN;
                     if (value > max)
                         max = value;
                 }
@@ -91,8 +91,8 @@ public class RangeFunction {
                 double min = Double.MAX_VALUE;
                 for (String cell : cells) {
                     double value = getCellValue(sheet, cell.trim());
-                    if (value == -1)
-                        return -1;
+                    if (value == Double.NaN)
+                        return Double.NaN;
                     if (value < min)
                         min = value;
                 }
