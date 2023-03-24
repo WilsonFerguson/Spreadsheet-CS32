@@ -78,7 +78,6 @@ public class FormulaCell extends RealCell {
 
 		double sum = 0;
 		for (String cell : cells) {
-			// sum += getValue(cell.trim());
 			double value = getValue(cell.trim());
 			if (value == -1)
 				return -1;
