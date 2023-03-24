@@ -26,7 +26,7 @@ public class FormulaCell extends RealCell {
 			if (c instanceof RealCell) {
 				return ((RealCell) c).getDoubleValue();
 			} else {
-				return 0.0;
+				return -1;
 			}
 		}
 	}
@@ -78,7 +78,11 @@ public class FormulaCell extends RealCell {
 
 		double sum = 0;
 		for (String cell : cells) {
-			sum += getValue(cell.trim());
+			// sum += getValue(cell.trim());
+			double value = getValue(cell.trim());
+			if (value == -1)
+				return -1;
+			sum += value;
 		}
 
 		if (method.equals("SUM"))
@@ -104,6 +108,9 @@ public class FormulaCell extends RealCell {
 		while (parts.length >= 3) {
 			double left = getValue(parts[0]);
 			double right = getValue(parts[2]);
+			if (left == -1 || right == -1)
+				return -1;
+
 			String operator = parts[1];
 
 			switch (operator) {
@@ -133,6 +140,21 @@ public class FormulaCell extends RealCell {
 		}
 
 		return result;
+	}
+
+	@Override
+	public String abbreviatedCellText() {
+		String output = String.valueOf(getDoubleValue());
+		if (output.equals("-1.0"))
+			output = "#ERROR";
+		if (output.length() > 10) {
+			output = output.substring(0, 10);
+		} else {
+			while (output.length() < 10) {
+				output += " ";
+			}
+		}
+		return output;
 	}
 
 }
