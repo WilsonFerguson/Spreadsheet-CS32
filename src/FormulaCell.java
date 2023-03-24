@@ -1,7 +1,10 @@
+import org.w3c.dom.ranges.Range;
+
 // CS3 Spreadsheet FormulaCell class.  Fill in the details.
 
 public class FormulaCell extends RealCell {
 	private Sheet sheet; // needed to find values of cells in the formula
+	private RangeFunction[] functions = RangeFunction.createFunctions();
 
 	public FormulaCell(String str, Sheet sheetIn) {
 		super(str);
@@ -66,7 +69,14 @@ public class FormulaCell extends RealCell {
 			return 0;
 
 		String method = parts[0].trim().toUpperCase();
-		if (!(method.equals("SUM") || method.equals("AVG")))
+		RangeFunction function = null;
+		for (RangeFunction f : functions) {
+			if (f.getName().equals(method)) {
+				function = f;
+				break;
+			}
+		}
+		if (function == null)
 			return 0;
 
 		String[] cells;
@@ -76,18 +86,7 @@ public class FormulaCell extends RealCell {
 			cells = new String[] { parts[1] };
 		}
 
-		double sum = 0;
-		for (String cell : cells) {
-			double value = getValue(cell.trim());
-			if (value == -1)
-				return -1;
-			sum += value;
-		}
-
-		if (method.equals("SUM"))
-			return sum;
-		else
-			return sum / cells.length;
+		return function.evaluate(sheet, cells);
 	}
 
 	// TODO: override the getDoubleValue() method
